@@ -50,7 +50,7 @@ class DQN(nn.Module):
 class DuelingDQN(nn.Module):
 
     def __init__(self, in_channels, num_actions):
-        super(Dueling_DQN, self).__init__()
+        super(DuelingDQN, self).__init__()
         self.num_actions = num_actions
 
         self.conv1 = nn.Conv2d(in_channels, 32, kernel_size=8, stride=4)
