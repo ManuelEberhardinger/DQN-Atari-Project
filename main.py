@@ -31,8 +31,8 @@ image_processor = ImageProcessor(84, device)
 BATCH_SIZE = 32
 GAMMA = 0.999
 EPS_START = 0.9
-EPS_END = 0.05
-EPS_DECAY = 200
+EPS_END = 0.1
+EPS_DECAY = 200000
 TARGET_UPDATE = 10
 
 IN_CHANNELS = 4
@@ -49,7 +49,7 @@ memory = ReplayMemory(1000000)
 LEARNING_STARTS = 0
 
 steps_done = 0
-steps_trained = 0
+steps_trained = 100000
 
 
 def select_action(current_state):
@@ -57,7 +57,7 @@ def select_action(current_state):
     global steps_trained
     sample = random.random()
     eps_threshold = EPS_END + (EPS_START - EPS_END) * math.exp(-1. * steps_trained / EPS_DECAY)
-
+    print(eps_threshold)
     if LEARNING_STARTS < steps_done:
         steps_trained += 1
 
