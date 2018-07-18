@@ -70,7 +70,7 @@ def select_action(current_state):
         return torch.LongTensor([[random.randrange(env.action_space.n)]]).to(device)
 
 
-def optimize_model(double_dqn=False):
+def optimize_model(double_dqn=True):
     if len(memory) < BATCH_SIZE:
         return
     transitions = memory.sample(BATCH_SIZE)
