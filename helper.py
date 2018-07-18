@@ -14,3 +14,7 @@ class ImageProcessor:
         # crop the image to a square image
         screen = screen[34:-16, :, :]
         return self.transformations(screen).squeeze(0).to(self.device)
+
+
+def video_callable(episode_id):
+    return episode_id % 20 == 0

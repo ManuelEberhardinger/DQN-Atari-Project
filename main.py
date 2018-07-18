@@ -4,7 +4,7 @@ import random
 import numpy as np
 from itertools import count
 from DQN import DQN, DuelingDQN, ReplayMemory, Transition
-from helper import ImageProcessor
+from helper import ImageProcessor, video_callable
 import torch
 import torch.optim as optim
 from torch.autograd import Variable
@@ -15,9 +15,10 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 # Atari Actions: 0 (noop), 1 (fire), 2 (left) and 3 (right) are valid actions for Breakout
 env = gym.make("Pong-v0")
 
+
 #start video recording
-#video_path = os.getcwd() + "/recording"
-#env = gym.wrappers.Monitor(env, video_path)
+video_path = os.getcwd() + "/recording-ddqn-dueling-pong"
+env = gym.wrappers.Monitor(env, video_path, video_callable=video_callable)
 
 env.reset()
 
@@ -29,11 +30,11 @@ print("Started on device:", device)
 image_processor = ImageProcessor(84, device)
 
 BATCH_SIZE = 32
-GAMMA = 0.999
-EPS_START = 0.9
-EPS_END = 0.1
-EPS_DECAY = 200000
-TARGET_UPDATE = 10
+GAMMA = 0.99
+EPS_START = 1.0
+EPS_END = 0.02
+EPS_DECAY = 30000
+TARGET_UPDATE = 1000
 
 IN_CHANNELS = 4
 
@@ -43,13 +44,13 @@ target_net = DuelingDQN(IN_CHANNELS, env.action_space.n).float().to(device)
 target_net.load_state_dict(policy_net.state_dict())
 target_net.eval()
 
-optimizer = optim.Adam(policy_net.parameters())
-memory = ReplayMemory(1000000)
+optimizer = optim.Adam(policy_net.parameters(), lr=0.0001)
+memory = ReplayMemory(100000)
 
-LEARNING_STARTS = 0
+LEARNING_STARTS = 10000
 
 steps_done = 0
-steps_trained = 100000
+steps_trained = 0
 
 
 def select_action(current_state):
@@ -151,14 +152,17 @@ for i_episode in range(num_episodes):
 
         # Perform one step of the optimization (on the target network)
         optimize_model()
+
+        # Update the target network
+        if steps_done % TARGET_UPDATE == 0:
+            target_net.load_state_dict(policy_net.state_dict())
+
         if done:
             print("Done")
             break
 
     torch.save(target_net.state_dict(), os.getcwd() + '/pong_dueling_dqn')
-    # Update the target network
-    if i_episode % TARGET_UPDATE == 0:
-        target_net.load_state_dict(policy_net.state_dict())
+
 
 torch.save(target_net.state_dict(), os.getcwd() + '/pong_dueling_dqn')
 print('Complete')
