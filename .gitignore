@@ -2,3 +2,5 @@
 pong_dueling_dqn
 .idea/
 __pycache__/
+.ipynb_checkpoints/
+MsPacman-v0_dueling_ddqn
